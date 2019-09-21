@@ -9,28 +9,30 @@
     <link rel="stylesheet" type="text/css" href="css/iconfont.css" />
     <link rel="stylesheet" type="text/css" href="css/main.css" />
     <link rel="stylesheet" href="./js/bootstrap/css/bootstrap.min.css" />
+    <!-- <script src="./js/bootstrap/js/bootstrap.min.js"></script> -->
+
   </head>
 
   <body>
-    <div class="modal fade" tabindex="-1" role="dialog">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title">错误提示</h4>
-          </div>
-          <div class="modal-body">
-            <p id="pResult"></p>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-          </div>
-        </div>
-        <!-- /.modal-content -->
-      </div>
-      <!-- /.modal-dialog -->
-    </div>
-    <!-- /.modal -->
+    
+    <!-- bootstap模态框 -->
+    <!-- 模态框（Modal） -->
+    <div class="modal fade">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+              <h4 class="modal-title">管理员登录</h4>
+            </div>
+            <div class="modal-body">
+            <p id="pmsg">&hellip;</p>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+            </div>
+          </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+      </div><!-- /.modal -->
     <div class="main_wrap">
       <div class="header">
         <a href="#" class="logo"><img src="images/logo.png" alt=""/></a>
@@ -49,41 +51,41 @@
         </form>
       </div>
     </div>
-
+   <script src="./js/utils/config.js"></script>
+    <script src="./js/utils/user.js"></script>
+    
     <script src="./js/lib/jquery-1.12.4.min.js"></script>
     <script src="./js/bootstrap/js/bootstrap.min.js"></script>
-    <script src="./js/utils/config.js"></script>
-    <script src="./js/utils/user.js"></script>
+    
 
     <script>
-      // 思路
-      // 给按钮添加点击事件
-      // 1. 收集用户的信息，进行简单的判断
-      // 2. ajax请求
-      // 3. 根据结果给反馈
-
-      $('#btnLogin').click(function() {
+      //点击登录
+      $('#btnLogin').click(function(){
         var userName = $('#userName').val();
-        var password = $('#password').val();
-        console.log(userName, password);
-        if (userName === '' || password === '') {
-          $('#pResult').html('用户名和密码不能为空！');
-          $('.modal').modal('show');
-          //   alert('心太大了');
-        } else {
-          user.login(userName, password, function(res) {
-            console.log(res);
-            if (res.code === 200) {
-              //   alert('ok');
-              window.location.href = './index.html';
-            } else {
-              //   alert(res.msg);
-              $('#pResult').html(res.msg);
+        var password =$('#password').val();
+
+        userLogin(userName,password,function(res){
+          //设置bootstrap模态框弹出时点击其他位置不会关闭
+              $('.modal').modal({backdrop: 'static', keyboard: false});
+            if(res.code == 200){
               $('.modal').modal('show');
+              window.location.href="index.html";
+            }else if(userName == ''|| password == ''){
+              $('.modal').modal('show');
+              $('#pmsg').html('好好写,有些内容为空');
+            }else{
+              $('.modal').modal('show');
+              $('#pmsg').html(res.msg);
             }
-          });
-        }
-      });
+            });
+        
+      })
+      
+        
     </script>
+
+    
+
+    
   </body>
 </html>

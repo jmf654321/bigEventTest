@@ -9,7 +9,10 @@
     <link rel="stylesheet" href="css/reset.css" />
     <link rel="stylesheet" href="css/iconfont.css" />
     <link rel="stylesheet" href="css/main.css" />
+    <link rel="stylesheet" href="./js/bootstrap/css/bootstrap.min.css">
     <script src="js/lib/jquery-1.12.4.min.js"></script>
+    <script src="./js/bootstrap/js/bootstrap.min.js"></script>
+    
   </head>
 
   <body>
@@ -48,6 +51,7 @@
       </div>
     </div>
 
+
     <div class="header_bar">
       <form class="search_form">
         <input type="text" placeholder="请输入搜索内容" />
@@ -63,6 +67,24 @@
     <div class="main" id="main_body">
       <iframe src="main_count.html" frameborder="0" id="main_frame" name="main_frame" frameborder="0" scrolling="auto"></iframe>
     </div>
+    <!-- 模态框 -->
+    <div class="modal fade">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+              <h4 class="modal-title">退出登录</h4>
+            </div>
+            <div class="modal-body">
+              <p>确定要退出登录吗&hellip;</p>
+            </div>
+            <div class="modal-footer">
+              <button id="btnSure" type="button" class="btn btn-default" data-dismiss="modal">确定</button>
+              <button id='btnCancle' type="button" class="btn btn-primary">取消</button>
+            </div>
+          </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
 
     <script>
       var $level01 = $('.level01');
@@ -138,31 +160,26 @@
       }
     </script>
 
-    <script src="./js/utils/config.js"></script>
-    <script src="./js/utils/user.js"></script>
+   
 
-    <script>
-      $(function() {
-        user.getInfo(function(res) {
-          console.log(res);
-          if (res.code === 200) {
-            $('#userName').html(res.data.nickname);
-            $('#userImg').attr('src', res.data.user_pic);
-          }
-        });
-      });
-      // 给按钮添加点击事件
-      // 1.调用 退出功能
-      $('#btnLogout').click(function() {
-        // todos:用模态框来代替
-        if (window.confirm('确定要退出吗？')) {
-          user.logout(function(res) {
-            if (res.code == 200) {
-              window.location.href = './login.html';
-            }
-          });
-        }
-      });
-    </script>
+    
   </body>
+  <script src="./js/utils/config.js"></script>
+  <script src="./js/utils/user.js"></script>
+  <script>
+    //退出功能
+    $('#btnLogout').click(function(){
+      userLogout(function(res){
+
+        $('.modal').modal('show');
+        $('#btnSure').click(function(){
+          window.location.href="login.html";
+        })
+        $('#btnCancle').click(function(){
+          $('.modal').modal('hide');
+        })
+      })
+    })
+
+  </script>
 </html>
