@@ -180,6 +180,11 @@
         })
       })
     })
-
+    //获取用户信息
+    getUserMsg(function(res){
+      $('#userName').html(res.data.nickname);
+      $('#userImg').attr('src',res.data.user_pic);
+      $('.user_center_link img').attr('src',res.data.user_pic);
+    })
   </script>
 </html>
