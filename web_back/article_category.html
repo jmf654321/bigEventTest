@@ -10,8 +10,6 @@
     <link rel="stylesheet" href="css/reset.css">
     <link rel="stylesheet" href="css/iconfont.css">
     <link rel="stylesheet" href="css/main.css">
-    <script src="js/jquery-1.12.4.min.js"></script>
-    <script src="js/bootstrap/js/bootstrap.min.js"></script>
 </head>
 
 <body>
@@ -28,8 +26,8 @@
                         <th class="text-center" width="100">操作</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr>
+                <tbody id="tableContent">
+                    <!-- <tr>
                         <td>未分类</td>
                         <td>uncategorized</td>
                         <td class="text-center">
@@ -37,49 +35,18 @@
                                 class="btn btn-info btn-xs">编辑</a>
                             <a href="javascript:deleteTr( 1 );" class="btn btn-danger btn-xs">删除</a>
                         </td>
-                    </tr>
-
-                    <tr>
-                        <td>奇趣事</td>
-                        <td>funny</td>
-                        <td class="text-center">
-                            <a href="javascript:editTr({&quot;id&quot;:&quot;2&quot;,&quot;slug&quot;:&quot;funny&quot;,&quot;name&quot;:&quot;奇趣事&quot;});"
-                                class="btn btn-info btn-xs">编辑</a>
-                            <a href="javascript:deleteTr( 2 );" class="btn btn-danger btn-xs">删除</a>
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <td>会生活</td>
-                        <td>living</td>
-                        <td class="text-center">
-                            <a href="javascript:editTr({&quot;id&quot;:&quot;3&quot;,&quot;slug&quot;:&quot;living&quot;,&quot;name&quot;:&quot;会生活&quot;});"
-                                class="btn btn-info btn-xs">编辑</a>
-                            <a href="javascript:deleteTr( 3 );" class="btn btn-danger btn-xs">删除</a>
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <td>爱旅行</td>
-                        <td>travel</td>
-                        <td class="text-center">
-                            <a href="javascript:editTr({&quot;id&quot;:&quot;4&quot;,&quot;slug&quot;:&quot;travel&quot;,&quot;name&quot;:&quot;爱旅行&quot;});"
-                                class="btn btn-info btn-xs">编辑</a>
-                            <a href="javascript:deleteTr( 4 );" class="btn btn-danger btn-xs">删除</a>
-                        </td>
-                    </tr>
+                    </tr>--> 
                 </tbody>
                 <tfoot>
                     <tr>
                         <td colspan="3" class="text-center">
-                            <a href="#" class="btn btn-success" data-toggle="modal" data-target="#addModal">新增分类</a>
+                            <a href="#" class="btn btn-success" id="addbtn" data-toggle="modal" data-target="#addModal">新增分类</a>
                         </td>
                     </tr>
                 </tfoot>
             </table>
         </div>
     </div>
-
     <div class="modal fade" id="addModal" >
         <div class="modal-dialog" role="document">
           <div class="modal-content">
@@ -89,16 +56,19 @@
             </div>
             <div class="modal-body">
               <form>
+                  <input type="hidden" class="myid">
                 <div class="form-group">
                   <label for="recipient-name" class="control-label">分类名称:</label>
                   <input type="text" class="form-control" id="recipient-name">
                 </div>
                 <div class="form-group">
-                  <label for="message-text" class="control-label">分类别名:</label>
-                  <input type="text" class="form-control" id="recipient-name">
+                  <label for="recipient-slug" class="control-label">分类别名:</label>
+                  <input type="text" class="form-control" id="recipient-slug">
                 </div>
               </form>
             </div>
+            <!-- 提示信息 -->
+            <div class="alert alert-danger" role="alert" id="divResult"></div>
             <div class="modal-footer">
               <button type="button" class="btn btn-default" id="model_shutoff">关闭</button>
               <button type="button" class="btn btn-primary" id="model_add">新增</button>
@@ -106,29 +76,136 @@
           </div>
         </div>
       </div>
-
+      <script src="./js/utils/config.js"></script>
+      <script src="./js/utils/category.js"></script>
+      <script src="./js/lib/jquery-1.12.4.min.js"></script>
+      <script src="js/bootstrap/js/bootstrap.min.js"></script>
       <script>
-          $('#addModal').modal({
-            show:false,
-            backdrop:false
-          });
+        //   $('#addModal').modal({
+        //     show:false,
+        //     backdrop:false
+        //   });
 
           $('#model_shutoff').click(function(){
-            alert('shutoff');
+            // alert('shutoff');
             $('#addModal').modal('hide');
           });
 
+        //   $('#model_add').click(function(){
+        //     alert('add');
+        //     $('#addModal').modal('hide');
+        //   });
+
+        //   $('.category_table').delegate('a','click',function(){
+        //       if($(this).hasClass('btn-info')){
+        //         $('#addModal .modal-title').html('修改分类名称');
+        //         $('#addModal').modal('show');
+        //       }
+        //   })      
+      </script>
+      
+      <script src="./js/lib/template-web.js"></script>
+      <script id="temp" type="text/html">
+        {{each data item}}
+        <tr>
+            <td>{{item.name}}</td>
+            <td>{{item.slug}}</td>
+            <td class="text-center">
+                <a href="javascript:doEdit({'id':'{{item.id}}','name':'{{item.name}}','slug':'{{item.slug}}'})"
+                    class="btn btn-info btn-xs" >编辑</a>
+                <a href="javascript:deleteTr( {{item.id}} );" class="btn btn-danger btn-xs">删除</a>
+            </td>
+        </tr>
+        {{/each}}
+
+      </script>
+      <script>
+          var status = '添加';
+          function dejquery(){
+            category.show(function(res){
+            var tbodyStr = template('temp',res);
+            $('#tableContent').html(tbodyStr);
+              })
+          }
+          //打开页面就进行回去信息显示已有的数据
+          $(function(){
+              dejquery();
+              
+          })
+          //新增
+          $('#addbtn').click(function(){
+               $('#recipient-name').val('');
+               $('#recipient-slug').val('');
+              status = '添加';
+              $('#divResult').hide();
+              $('.modal-title').text('新增分类');
+            $('#model_add').text('新增');
+          })
+          //添加
           $('#model_add').click(function(){
-            alert('add');
-            $('#addModal').modal('hide');
-          });
+            var name = $('#recipient-name').val();
+            var slug = $('#recipient-slug').val();
+            if(name=='' || slug ==''){
+            $('#divResult').show().text('分类名称或分类别名不能为空');
 
-          $('.category_table').delegate('a','click',function(){
-              if($(this).hasClass('btn-info')){
-                $('#addModal .modal-title').html('修改分类名称');
-                $('#addModal').modal('show');
+            }else{
+                if(status == '添加'){
+                    category.add(name,slug,function(res){
+                       if(res.code == 200){
+                        $('#divResult').hide();
+                        $('#addModal').modal('hide');
+
+                        dejquery();
+                       }else{
+                        $('#divResult').show().text(res.msg);
+                       }
+                    })
+                }else{
+                   var id = $('.myid').val();
+                    category.edit(id,name,slug,function(res){
+                        console.log(res);
+                        if(res.code == 200){
+                        $('#divResult').hide();
+                        $('#addModal').modal('hide');
+                        dejquery();
+                       }else{
+                        $('#divResult').show().text(res.msg);
+                       }
+
+                    })
+                }
+            } 
+          })
+          //编辑
+          
+          function doEdit(obj){
+            //   alert(1);
+              //模态框显示
+            $('#addModal').modal('show');
+            $('#divResult').hide();
+            $('.modal-title').text('编辑分类');
+            $('#model_add').text('保存修改');
+            //打开某个进行编辑里面两个输入框应该有信息
+            $('#recipient-name').val(obj.name);
+            $('#recipient-slug').val(obj.slug);
+            status ='编辑'
+            //获取id值
+            $('.myid').val(obj.id);
+          }
+
+          //删除
+          function deleteTr(id){
+              if(window.confirm('确定要删除吗？')){
+                  category.del(id,function(res){
+                      if(res.code == 200){
+                      dejquery();}   
+                  });
               }
-          })      
+
+          }
+
+
+
       </script>
 
 </body>
