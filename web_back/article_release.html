@@ -33,13 +33,13 @@
                 <div class="form-group">
                     <label for="inputPassword3" class="col-sm-2 control-label">文章封面：</label>
                     <div class="col-sm-10">
-                        <input type="file" id="exampleInputFile" name="file">
+                        <input type="file" id="exampleInputFile" name="cover">
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="inputEmail3" class="col-sm-2 control-label">文章类别：</label>
                     <div class="col-sm-4">
-                        <select class="form-control" name="number">
+                        <select class="form-control" name="type">
                             <!-- <option>1</option>
                             <option>2</option>
                             <option>3</option>
@@ -72,7 +72,7 @@
                 </div>
                 <div class="form-group">
                     <div class="col-sm-offset-2 col-sm-10">
-                        <button type="button" class="btn btn-success">发布</button>
+                        <button type="button" class="btn btn-success" id="send">发布</button>
                         <button type="button" class="btn btn-default">存为草稿</button>
                     </div>
                 </div>
@@ -96,21 +96,28 @@
                     var optionStr = template('tmp',res);
                     $('.form-control').html(optionStr)
                 }
-            })
+            });
             
             
             
-            $('.btn-success').click(function(){
+            $('#send').click(function(){
                
                 var fd = new FormData($('#myform')[0]);
                 fd.append('state','已发布');
                 fd.set('content', tinyMCE.activeEditor.getContent());
+                console.log(fd);
                 article.publish(fd,function(res){
-                    console.log(res);
+                    // console.log(res);
+                    if(res.code == 201){
+                        window.location.href="article_list.html"
+                    }else{
+                        alert(res.msg);
+                    }
                 })
+                
 
-            })
-        })  
+            });
+        });  
     </script>
 </body>
 </html>
