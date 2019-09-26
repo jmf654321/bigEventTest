@@ -22,6 +22,20 @@ var article ={
 
         })
 
+    },
+    edit:function(fd,callback){
+        $.ajax({
+            url:userUrls.article_edit,
+            type:'post',
+            data:fd,
+            processData:false,
+            contentType:false,
+            success:function(res){
+                callback(res)
+            }
+
+        })
+
     }
 
 }

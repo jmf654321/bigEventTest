@@ -13,6 +13,7 @@ userUrls={
     article_del:userURl+'/admin/article_delete',
     article_add:userURl+'/admin/category_add',
     article_publish:userURl+'/admin/article_publish',
+    article_edit:userURl+'/admin/article_edit',
 
 
 

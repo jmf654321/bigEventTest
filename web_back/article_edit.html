@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="css/iconfont.css">
     <link rel="stylesheet" href="css/main.css">
     <link type="text/css" rel="stylesheet" href="js/jedate/css/jedate.css">
-    <script src="js/jquery-1.12.4.min.js"></script>
+    <script src="js/lib/jquery-1.12.4.min.js"></script>
     <script src="js/jedate/js/jedate.js"></script>
     <script src="js/tinymce/js/tinymce/tinymce.min.js"></script>
     <script src="js/tinymce/js/tinymce_setup.js"></script>
@@ -23,29 +23,29 @@
             文章编辑
         </div>
         <div class="container-fluid common_con">
-            <form class="form-horizontal article_form">
+            <form class="form-horizontal article_form" id="myform">
                 <div class="form-group">
                     <label for="inputEmail3" class="col-sm-2 control-label">文章标题：</label>
                     <div class="col-sm-10">
-                        <input type="email" class="form-control" id="inputEmail3" value="文章标题文字">
+                        <input type="email" name="title" class="form-control" id="article_title" value="文章标题文字">
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="inputPassword3" class="col-sm-2 control-label">文章封面：</label>
                     <div class="col-sm-10">
-                        <img src="images/pic06.jpg" class="article_cover">
-                        <input type="file" id="exampleInputFile">
+                        <img src="images/pic06.jpg" class="article_cover" id="article_cover">
+                        <input type="file" name="cover">
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="inputEmail3" class="col-sm-2 control-label">文章类别：</label>
                     <div class="col-sm-4">
-                        <select class="form-control">
-                            <option>类别一</option>
+                        <select class="form-control" name="type" id="article_type">
+                            <!-- <option>类别一</option>
                             <option>类别二</option>
                             <option>类别三</option>
                             <option selected>类别四</option>
-                            <option>类别五</option>
+                            <option>类别五</option> -->
                         </select>
                     </div>
                 </div>
@@ -54,7 +54,8 @@
                     <div class="col-sm-4">
 
                         <div class="input-group">
-                            <input type="text" class="form-control" value="2019-05-17" id="dateinput">
+                            <input type="text" class="form-control" id="article_date" value="2019-05-17" id="dateinput"
+                                name="date">
                             <span class="input-group-btn">
                                 <button class="btn btn-default" type="button"
                                     onclick="jeDate('#dateinput',{trigger:false,format: 'YYYY-MM-DD'})"><i
@@ -66,17 +67,103 @@
                 <div class="form-group">
                     <label for="inputEmail3" class="col-sm-2 control-label">文章内容：</label>
                     <div class="col-sm-10">
-                        <input type="text" class="form-control" id="rich_content" name="content" placeholder="文章内容" value="文章内容">
+                        <input type="text" class="form-control" id="rich_content" name="content" placeholder="文章内容"
+                            value="文章内容">
                     </div>
                 </div>
                 <div class="form-group">
                     <div class="col-sm-offset-2 col-sm-10">
-                        <button type="submit" class="btn btn-success">修改</button>
+                        <button type="button" id="btnSave" class="btn btn-success">修改</button>
                     </div>
                 </div>
             </form>
         </div>
     </div>
+    <script src="./js/utils/config.js"></script>
+    <script src="./js/utils/article.js"></script>
+    <script src="./js/utils/category.js"></script>
+    <script src="./js/lib/template-web.js"></script>
+    <script id="temp" type="text/html">
+        {{each data item}}
+        <option value='{{item.id}}'>{{item.name}}</option>
+        {{/each}}
+    </script>
+    <script>
+        //获取id
+        //将地址栏中的信息转换成对象
+        function formatToObj(str) {
+            var obj = {};
+            var arr = str.split('&');
+            arr.forEach(function (item) {
+                var arr2 = item.split('=');
+                obj[arr2[0]] = arr2[1];
+            })
+            return obj;
+        }
+        $(function () {
+            var str = window.location.search.split('?')[1];
+            var obj = formatToObj(str);
+            var id = obj.id;
+            console.log(id);
+            getAndShow(id);
+            function getAndShow(id) {
+
+
+                //将原来的信息显示出来
+                if (isNaN(id)) {
+                    alert('id不符合');
+                    return;
+                }
+
+                article.show({ id: id }, function (res) {
+                    var type = res.data.type;
+                    if (res.code == 200) {
+                        //将类别显示出来
+                        category.show(function (res) {
+                            if (res.code == 200) {
+                                //将类别先显示出来
+                                $('#article_type').html(template('temp', res));
+                                //将type的值写在这里的原因是因为ajax请求是异步的，当类别请求还没完成是
+                                //代码往下执行 类别选择时 没有执行完类别的请求 所以默认选第一个
+                                $('#article_type').val(type);
+
+                            }
+
+                        })
+                        $('#article_title').val(res.data.title);
+                        $('#article_cover').attr('src', res.data.cover);
+                        $('#article_date').val(res.data.date);
+                        //富文本框有延迟 所以用了一个延迟
+                        setTimeout(function () {
+                            tinyMCE.activeEditor.setContent(res.data.content);
+                        }, 1000);
+
+                    } else {
+                        console.log(res.msg);
+                    }
+
+
+                })
+                //点击修改提交数据
+                $('#btnSave').click(function () {
+                    var fd = new FormData($('#myform')[0]);
+                    fd.append('id',id);
+                    fd.set('content',  tinyMCE.activeEditor.getContent());
+                    article.edit(fd, function (res) {
+                        if(res.code == 200){
+                            alert('修改成功');
+                        }else{
+                            alert('修改不成功')
+                        }
+                        
+                    })
+                })
+
+            }
+
+
+        })
+    </script>
 
 </body>
 
