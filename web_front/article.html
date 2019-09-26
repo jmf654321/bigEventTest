@@ -193,7 +193,7 @@
         {{each data item}}
         <div class="comment_detail_list">
             <div class="person_pic fl">{{item.name.substr(0,1)}}</div>
-            <div class="name_time fl"><b>{{item.name}}</b><span>{{item.dt}}</span></div>
+            <div class="name_time fl"><b>{{item.name}}</b><span>{{getTime(item.dt)}}</span></div>
             <div class="comment_text fl">
                 {{item.content}}
             </div>
@@ -254,10 +254,13 @@
             //评论显示
             function commentShow(id){
                 comment.show(id,function(res){
-                res.data.forEach(function(item){
-                    item.dt=getTime(item.dt);
-                })
+                    //第一种方法在template中
+                // res.data.forEach(function(item){
+                //     item.dt=getTime(item.dt);
+                // })
                 if(res.code == 200){
+                    //第二种方法在template中直接使用外部函数需要写下面一句话
+                    template.defaults.imports.getTime = getTime;
                     $('#comment_list').html(template('temp',res));
                 }
             })
