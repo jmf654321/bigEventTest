@@ -56,7 +56,7 @@
     <div class="main_con clearfix">
         <div class="left_con">
             <ul class="focus_list">
-                <li class="first">
+                <!-- <li class="first">
                     <a href="#"><img src="images/pic01.jpg" alt=""></a>
                     <p>图片说明</p>
                 </li>
@@ -75,7 +75,7 @@
                 <li>
                     <a href="#"><img src="images/pic06.jpg" alt=""></a>
                     <p>图片说明</p>
-                </li>
+                </li> -->
             </ul>
 
             <div class="common_title">
@@ -220,6 +220,38 @@
         <p>CopyRight © 2019 深圳大事件信息技术股份有限公司   All Rights Reserved</p>
         <p>电话：0755-****888    粤ICP备*******8号</p>
     </div>
+    <script src="./js/jquery-1.12.4.min.js"></script>
+    <script src="./js/utils/config.js"></script>
+    <script src="./js/utils/article.js"></script>
+    <script src="./js/template-web.js"></script>
+    <script id="tep" type="text/html">
+        {{each data item index}}
+        {{if index == 0}}
+        <li class="first">
+                <a href="article.html?id={{item.id}}"><img src="{{item.cover}}" alt=""></a>
+                <p>{{item.title}}</p>
+        </li>
+        {{else}}
+        <li>
+                <a href="article.html?id={{item.id}}"><img src="{{item.cover}}" alt=""></a>
+                <p>{{item.title}}</p>
+        </li>
+        {{/if}}
+        {{/each}}
+    </script>
+    
+    <script>
+        $(function(){
+            //将页面显示出来
+            var perpage = 5;
+            article.show({perpage:perpage},function(res){
+                
+                if(res.code == 200){
+                    $('.focus_list').html(template('tep',res));
+                }
+            })
+        })
+    </script>
 
 </body>
 
